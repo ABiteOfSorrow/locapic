@@ -3,6 +3,7 @@ import React from "react";
 import HomeScreen from "./screens/HomeScreen";
 import MapScreen from "./screens/MapScreen";
 import ChatScreen from "./screens/ChatScreen";
+import POIScreen from "./screens/POIScreen";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -13,8 +14,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { createStore, combineReducers } from "redux";
 import { Provider } from "react-redux";
 import pseudo from "./reducers/pseudo";
+import listPOI from "./reducers/listPOI";
 
-const store = createStore(combineReducers({ pseudo }));
+const store = createStore(combineReducers({ pseudo, listPOI }));
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -30,6 +32,8 @@ const BottomMenuTabs = () => {
             iconName = "navigate";
           } else if (route.name === "Chat") {
             iconName = "chatbubbles-sharp";
+          } else if (route.name === "POI") {
+            iconName = "location";
           }
           return <Ionicons name={iconName} size={25} color={color} />;
         },
@@ -44,6 +48,7 @@ const BottomMenuTabs = () => {
     >
       <Tab.Screen name="Map" component={MapScreen} />
       <Tab.Screen name="Chat" component={ChatScreen} />
+      <Tab.Screen name="POI" component={POIScreen} />
     </Tab.Navigator>
   );
 };

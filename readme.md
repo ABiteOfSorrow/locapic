@@ -17,3 +17,5 @@ npm install @react-navigation/bottom-tabs@5 --save
 npm install react-native-elements --save
 
 npm install --save redux react-redux
+
+expo install react-native-maps expo-location expo-permissions
