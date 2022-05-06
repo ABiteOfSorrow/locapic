@@ -1,3 +1,6 @@
+import { LogBox } from "react-native";
+LogBox.ignoreAllLogs();
+
 import React from "react";
 
 import HomeScreen from "./screens/HomeScreen";
@@ -16,10 +19,13 @@ import { Provider } from "react-redux";
 import pseudo from "./reducers/pseudo";
 import listPOI from "./reducers/listPOI";
 
+
 const store = createStore(combineReducers({ pseudo, listPOI }));
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
+
 
 const BottomMenuTabs = () => {
   return (

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Modal, Pressable, Alert } from "react-native";
-import { Button, Overlay, Input } from "react-native-elements";
+import { StyleSheet, Text, View, Modal, Pressable } from "react-native";
+import { Button, Input } from "react-native-elements";
 import { Ionicons } from "@expo/vector-icons";
 
 import MapView, { Marker } from "react-native-maps";
@@ -8,9 +8,8 @@ import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 
 import { connect } from "react-redux";
-     
-function MapScreen(props) {
 
+function MapScreen(props) {
   const [currentLatitude, setCurrentLatitude] = useState(0);
   const [currentLongitude, setCurrentLongitude] = useState(0);
   const [addPOI, setAddPOI] = useState(false);
@@ -21,6 +20,7 @@ function MapScreen(props) {
   const [descPOI, setDescPOI] = useState();
   const [tempPOI, setTempPOI] = useState();
 
+  //Ask permission of location, set default location
   useEffect(() => {
     async function askPermissions() {
       let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -35,68 +35,75 @@ function MapScreen(props) {
     askPermissions();
   }, []);
 
+  //Set list POI for each change
   useEffect(() => {
     setListPOI(props.POI);
   }, [props.POI]);
 
-
+  //Add marker on map
   var markerInput = (e) => {
     if (addPOI) {
       setAddPOI(false);
       setModalVisible(true);
-      setTempPOI({ latitude: e.nativeEvent.coordinate.latitude, longitude: e.nativeEvent.coordinate.longitude });
+      setTempPOI({
+        latitude: e.nativeEvent.coordinate.latitude,
+        longitude: e.nativeEvent.coordinate.longitude,
+      });
     }
-  }
+  };
 
+  //If title & description are not empty send info to POI screen & map
   var handleSubmit = () => {
-    setListPOI([
-      ...listPOI,
-      {
+    if (titrePOI != null && descPOI != null) {
+      setListPOI([
+        ...listPOI,
+        {
+          longitude: tempPOI.longitude,
+          latitude: tempPOI.latitude,
+          titre: titrePOI,
+          description: descPOI,
+        },
+      ]);
+      var sendPOI = {
         longitude: tempPOI.longitude,
         latitude: tempPOI.latitude,
         titre: titrePOI,
         description: descPOI,
-      },
-    ]);
-    var sendPOI = {
-      longitude: tempPOI.longitude,
-      latitude: tempPOI.latitude,
-      titre: titrePOI,
-      description: descPOI,
-    };
-    setModalVisible(false);
-    setTempPOI();
-    setDescPOI();
-    setTitrePOI();
-    props.onSubmitListPOI(sendPOI);
+      };
+      setModalVisible(false);
+      setTempPOI();
+      setDescPOI();
+      setTitrePOI();
+      props.onSubmitListPOI(sendPOI);
+    } else {
+      alert("Have you forgotten anything? \n Please check the field");
+    }
   };
 
-
-
+  //Listing marker on map
   var markerPOI = listPOI.map((POI, i) => {
-      return <Marker
-          key={i}
-          coordinate={{ latitude: POI.latitude, longitude: POI.longitude }}
-          title={POI.titre}
-          description={POI.description}
-          pinColor="blue"
-          opacity={1} // Modifier l'opacité
-        />
-      });
-      var isDisabled = false;
-      if (addPOI) {
-        isDisabled = true;
-      }
-      
+    return (
+      <Marker
+        key={i}
+        coordinate={{ latitude: POI.latitude, longitude: POI.longitude }}
+        title={POI.titre}
+        description={POI.description}
+        pinColor="blue"
+        opacity={1} // Modifier l'opacité
+      />
+    );
+  });
 
   return (
     <View style={{ flex: 1 }}>
-
-<Modal
+      {/* Modal for input info of marker */}
+      <Modal
         animationType="fade"
         transparent={true}
         visible={modalVisible}
-        onBackdropPress={() => { setModalVisible(false) }}
+        onBackdropPress={() => {
+          setModalVisible(false);
+        }}
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
@@ -132,6 +139,7 @@ function MapScreen(props) {
           longitudeDelta: 0.0421,
         }}
       >
+        {/* Default marker for user location */}
         <Marker
           key={"currentPos"}
           coordinate={{ latitude: currentLatitude, longitude: currentLongitude }}
@@ -141,26 +149,17 @@ function MapScreen(props) {
           pinColor="red"
           opacity={1} // Modifier l'opacité
         />
-        {markerPOI }
+        {markerPOI}
       </MapView>
-
-
-
+      {/* Add POI button in bottom */}
       <Button
-              disabled={addPOI}
-              title=" Add POI"
-              icon={<Ionicons name="location" size={24} color="#ffffff" />}
-              buttonStyle={{ backgroundColor: "#eb4d4b" }}
-              type="solid"
+        disabled={addPOI}
+        title=" Add POI"
+        icon={<Ionicons name="location" size={24} color="#ffffff" />}
+        buttonStyle={{ backgroundColor: "#eb4d4b" }}
+        type="solid"
         onPress={() => setAddPOI(true)}
-
-
-
-
-
       />
-
-     
     </View>
   );
 }
@@ -214,10 +213,12 @@ const styles = StyleSheet.create({
   },
 });
 
+// set state POI to props for use
 function mapStateTtoProps(state) {
   return { POI: state.listPOI };
 }
 
+// Send POI info to store for save
 function mapDispatchToProps(dispatch) {
   return {
     onSubmitListPOI: function (POI) {

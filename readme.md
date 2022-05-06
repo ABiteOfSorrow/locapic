@@ -19,3 +19,7 @@ npm install react-native-elements --save
 npm install --save redux react-redux
 
 expo install react-native-maps expo-location expo-permissions
+
+npm install socket.io --save (backend)
+
+npm install --save socket.io-client (frontend)

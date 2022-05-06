@@ -1,7 +1,8 @@
-export default function(pseudo = '', action) {
-    if(action.type == 'savePseudo') {
-        return action.pseudo;
-    } else {
-        return pseudo;
-    }
+// For save user nickname
+export default function (pseudo = "", action) {
+  if (action.type == "savePseudo") {
+    return action.pseudo;
+  } else {
+    return pseudo;
+  }
 }
